@@ -12,6 +12,8 @@ This code sets up kibana and elastic in a secure way.
   - set memory limits for elastic to use
   - set a valid email address for letsencrypt certificate use
   - set router access to true/false (recommend false for production)
+  - optional: set where you want elastic data to reside on the host system
 - Run docker-compose up -d
 - Test your URLs
 - Enjoy
+
