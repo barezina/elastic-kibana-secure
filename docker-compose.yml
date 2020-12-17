@@ -1,0 +1,60 @@
+version: '3.0'
+services:
+    elastic:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+        env_file: .env
+        container_name: "a.elastic"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.elastic.rule=Host(`${elastic_url}`)"
+            - "traefik.http.routers.elastic.entrypoints=websecure"
+            - "traefik.http.routers.elastic.tls.certresolver=myresolver"
+        environment:
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - "${elastic_memory_allocation}"
+            - ELASTIC_USERNAME=${service_username}
+            - ELASTIC_PASSWORD=${service_password}
+            - xpack.security.enabled=true
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+    kibana:
+        image: docker.elastic.co/kibana/kibana:7.10.1
+        env_file: .env
+        container_name: "a.kibana"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.kibana.rule=Host(`${kibana_url}`)"
+            - "traefik.http.routers.kibana.entrypoints=websecure"
+            - "traefik.http.routers.kibana.tls.certresolver=myresolver"
+        environment:
+            ELASTICSEARCH_HOSTS: http://elastic:9200
+            ELASTICSEARCH_USERNAME: ${service_username}
+            ELASTICSEARCH_PASSWORD: ${service_password}
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+    traefik:
+        image: traefik:latest
+        container_name: "a.traefik"
+        command:
+            - "--log.level=DEBUG"
+            - "--api.insecure=${router_access}"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entrypoints.websecure.address=:443"
+            - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+            - "--certificatesresolvers.myresolver.acme.email=${letsencrypt_email_contact}"
+            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+        labels:
+            - "traefik.http.middlewares.force-https.redirectscheme.scheme=https"
+        ports:
+            - "443:443"
+            - "8080:8080"
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
+            - "./letsencrypt:/letsencrypt"
+
