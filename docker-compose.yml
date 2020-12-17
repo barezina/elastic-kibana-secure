@@ -4,6 +4,8 @@ services:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
         env_file: .env
         container_name: "a.elastic"
+        volumes:
+        - ${host_elastic_folder}:/usr/share/elasticsearch/data
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.elastic.rule=Host(`${elastic_url}`)"
