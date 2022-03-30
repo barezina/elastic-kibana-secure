@@ -1,6 +1,6 @@
 # Quick Setup Guide
 
-This code sets up kibana and elastic in a secure way.
+This code sets up kibana and elastic. It is recommended to have both of these behind a load balancer.
 
 - Point a kibana and elastic domain at your new ec2 instance.
 - Clean Ubuntu 20.04 Box (aws).
