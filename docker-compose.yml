@@ -6,11 +6,6 @@ services:
         container_name: "a.elastic"
         volumes:
         - ${host_elastic_folder}:/usr/share/elasticsearch/data
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.elastic.rule=Host(`${elastic_url}`)"
-            - "traefik.http.routers.elastic.entrypoints=websecure"
-            - "traefik.http.routers.elastic.tls.certresolver=myresolver"
         environment:
             - discovery.type=single-node
             - bootstrap.memory_lock=true
@@ -26,11 +21,6 @@ services:
         image: docker.elastic.co/kibana/kibana:7.10.1
         env_file: .env
         container_name: "a.kibana"
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.kibana.rule=Host(`${kibana_url}`)"
-            - "traefik.http.routers.kibana.entrypoints=websecure"
-            - "traefik.http.routers.kibana.tls.certresolver=myresolver"
         environment:
             ELASTICSEARCH_HOSTS: http://elastic:9200
             ELASTICSEARCH_USERNAME: ${service_username}
@@ -39,24 +29,4 @@ services:
             memlock:
                 soft: -1
                 hard: -1
-    traefik:
-        image: traefik:latest
-        container_name: "a.traefik"
-        command:
-            - "--log.level=DEBUG"
-            - "--api.insecure=${router_access}"
-            - "--providers.docker=true"
-            - "--providers.docker.exposedbydefault=false"
-            - "--entrypoints.websecure.address=:443"
-            - "--certificatesresolvers.myresolver.acme.email=${letsencrypt_email_contact}"
-            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-            - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-        labels:
-            - "traefik.http.middlewares.force-https.redirectscheme.scheme=https"
-        ports:
-            - "443:443"
-            - "8080:8080"
-        volumes:
-            - "/var/run/docker.sock:/var/run/docker.sock"
-            - "./letsencrypt:/letsencrypt"
 
