@@ -1,7 +1,7 @@
 version: '3.0'
 services:
     elastic:
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.1.1
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.4.0
         env_file: .env
         container_name: "a.elastic"
         ports: 
@@ -12,23 +12,19 @@ services:
             - discovery.type=single-node
             - bootstrap.memory_lock=true
             - "${elastic_memory_allocation}"
-            - ELASTIC_USERNAME=${service_username}
-            - ELASTIC_PASSWORD=${service_password}
             - xpack.security.enabled=true
         ulimits:
             memlock:
                 soft: -1
                 hard: -1
     kibana:
-        image: docker.elastic.co/kibana/kibana:8.1.1
+        image: docker.elastic.co/kibana/kibana:8.4.0
         env_file: .env
         container_name: "a.kibana"
         ports:
         - "5601:5601"
         environment:
             ELASTICSEARCH_HOSTS: http://elastic:9200
-            ELASTICSEARCH_USERNAME: ${service_username}
-            ELASTICSEARCH_PASSWORD: ${service_password}
         ulimits:
             memlock:
                 soft: -1
