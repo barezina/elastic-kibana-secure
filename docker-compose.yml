@@ -25,6 +25,8 @@ services:
         - "5601:5601"
         environment:
             ELASTICSEARCH_HOSTS: http://elastic:9200
+            ELASTICSEARCH_USERNAME: ${service_username}
+            ELASTICSEARCH_PASSWORD: ${service_password}
         ulimits:
             memlock:
                 soft: -1
